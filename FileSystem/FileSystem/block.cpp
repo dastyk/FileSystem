@@ -12,7 +12,7 @@ Block::Block(int size) {
     this->block = new char[this->nrOfElements];
 
     // Sets everything to 0
-    this->reset();
+  //  this->reset();
 }
 
 Block::Block(const Block &other) {
@@ -59,8 +59,8 @@ Block Block::readBlock() const {
 
 int Block::writeBlock(const std::string &strBlock) {
     int output = -2;    // Assume out of range
-    if (strBlock.size() == (unsigned long)this->nrOfElements) {
-        for (int i = 0; i < this->nrOfElements; ++i) {
+    if (strBlock.size() < (unsigned long)this->nrOfElements) {
+        for (int i = 0; i < strBlock.size(); ++i) {
             this->block[i] = strBlock[i];
         }
         output = 1;
@@ -83,9 +83,9 @@ int Block::writeBlock(const std::vector<char> &vec) {
     return output;
 }
 
-void Block::writeBlock(const char cArr[]) {
-    for (int i = 0; i < this->nrOfElements; ++i) {
-        this->block[i] = cArr[i];
+void Block::writeBlock(const char cArr[], int bytewidth, int offset) {
+    for (int i = 0; i < bytewidth; ++i) {
+        this->block[offset + i] = cArr[i];
     }
 }
 

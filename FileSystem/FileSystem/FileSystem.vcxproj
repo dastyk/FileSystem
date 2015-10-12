@@ -144,12 +144,16 @@
   <ItemGroup>
     <ClInclude Include="block.h" />
     <ClInclude Include="blockdevice.h" />
+    <ClInclude Include="Directory.h" />
+    <ClInclude Include="File.h" />
     <ClInclude Include="filesystem.h" />
     <ClInclude Include="memblockdevice.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="block.cpp" />
     <ClCompile Include="blockdevice.cpp" />
+    <ClCompile Include="Directory.cpp" />
+    <ClCompile Include="File.cpp" />
     <ClCompile Include="filesystem.cpp" />
     <ClCompile Include="memblockdevice.cpp" />
     <ClCompile Include="shell.cpp" />

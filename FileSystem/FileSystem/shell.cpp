@@ -1,7 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include "filesystem.h"
-
+#include <crtdbg.h>
+#define _CRTDBG_MAP_ALLOC
 using namespace std;
 
 const int MAXCOMMANDS = 8;
@@ -22,15 +23,22 @@ std::vector<string> split(const string &filePath, const char delim = '/');
 string help();
 
 int main(void) {
-
+#if defined(DEBUG) | defined(_DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); // Memoryleak detection.
+																  //_crtBreakAlloc = 263;
+#endif
     string userCommand, commandArr[MAXCOMMANDS];
     string user = "user@DV1492";    // Change this if you want another user to be displayed
-    string currentDir = "/";    // current directory, used for output
+
+	FileSystem fSystem;
+
+	if (fSystem.Init() == -1)
+		return -1;
 
     bool bRun = true;
 
     do {
-        cout << user << ":" << currentDir << "$ ";
+        cout << user << ":" << fSystem.GetCurrDirPath() << "$ ";
         getline(cin, userCommand);
 
         int nrOfCommands = parseCommandString(userCommand, commandArr);
@@ -44,14 +52,14 @@ int main(void) {
                 cout << "Exiting\n";
                 break;
             case 1: // format
-                // Call fileSystem.format()
+				cout << fSystem.format() << endl;
                 break;
             case 2: // ls
-                cout << "Listing directory" << endl;
-                // Call filesystem.ls()
+                cout << "Listing directory" << endl << endl;
+				cout << fSystem.ls();
                 break;
             case 3: // create
-
+				cout << fSystem.create(commandArr[1]) << endl;
                 break;
             case 4: // cat
 
@@ -63,7 +71,7 @@ int main(void) {
 
                 break;
             case 7: // rm
-
+				cout << fSystem.rm(commandArr[1]) << endl;
                 break;
 
             case 8: // copy
@@ -75,15 +83,15 @@ int main(void) {
                 break;
 
             case 10: // rename
-
+				cout << fSystem.rename(commandArr[1], commandArr[2]) << endl;
                 break;
 
             case 11: // mkdir
-
+				cout << fSystem.mkdir(commandArr[1]) << endl;
                 break;
 
             case 12: // cd
-
+				cout << fSystem.cd(commandArr[1]) << endl;
                 break;
 
             case 13: // pwd
