@@ -62,7 +62,7 @@ int main(void) {
 				cout << fSystem.create(commandArr[1]) << endl;
                 break;
             case 4: // cat
-
+				cout << fSystem.cat(commandArr[1]) << endl;
                 break;
             case 5: // save
 
@@ -75,11 +75,11 @@ int main(void) {
                 break;
 
             case 8: // copy
-
+				cout << fSystem.copy(commandArr[1], commandArr[2]) << endl;
                 break;
 
             case 9: // append
-
+				cout << fSystem.append(commandArr[1], commandArr[2]) << endl;
                 break;
 
             case 10: // rename
@@ -95,7 +95,7 @@ int main(void) {
                 break;
 
             case 13: // pwd
-
+				cout << "Working directory: " << fSystem.GetCurrDirPath() << endl;
                 break;
 
             case 14: // help

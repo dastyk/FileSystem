@@ -29,6 +29,8 @@ const int MemBlockDevice::SaveFile(const std::string & data, FileHeader& file, i
 	{
 		FreeMemoryBlock(file.blockPointers[i]);
 	}
+	if (file.nrofblocks > 0)
+		file.blockPointers = 0;
 
 	file.size = data.size();
 	file.nrofblocks = file.size / blocksize;
@@ -56,7 +58,7 @@ const int MemBlockDevice::SaveFile(const std::string & data, FileHeader& file, i
 	{
 		return -1;
 	}
-	err = writeBlock(blocknr, (char*)&file.blockPointers, sizeof(int)*file.nrofblocks, sizeof(int) * 4 + file.namesize);
+	err = writeBlock(blocknr, (char*)file.blockPointers, sizeof(int)*file.nrofblocks, sizeof(int) * 4 + file.namesize);
 	if (err != 1)
 	{
 		return -1;
@@ -64,7 +66,8 @@ const int MemBlockDevice::SaveFile(const std::string & data, FileHeader& file, i
 	int size = file.size;
 	for (int i = 0; i < file.nrofblocks; i++)
 	{
-		int err = writeBlock(file.blockPointers[i], (data.c_str() + i*blocksize), (size <= blocksize) ? blocksize : size%blocksize, 0);
+		int s = (size < blocksize) ? size%blocksize : blocksize;
+		int err = writeBlock(file.blockPointers[i], (data.c_str() + i*blocksize), s, 0);
 		if (err != 1)
 		{
 			return -1;
@@ -106,10 +109,10 @@ const int MemBlockDevice::LoadFile(std::string & data, FileHeader & file, int bl
 
 	int temp;
 
-	memcpy(&file.blockPointers, dat.c_str() + offset, sizeof(int)*file.nrofblocks);
+	memcpy(file.blockPointers, dat.c_str() + offset, sizeof(int)*file.nrofblocks);
 	offset += sizeof(int)*file.nrofblocks;
 
-	char arr[blocksize + 1];
+	char arr[blocksize];
 
 	int size = file.size;
 	for (int i = 0; i < file.nrofblocks; i++)
@@ -117,10 +120,13 @@ const int MemBlockDevice::LoadFile(std::string & data, FileHeader & file, int bl
 		Block b = readBlock(file.blockPointers[i]);
 		dat = b.toString();
 
-		memcpy(arr, dat.c_str(), (size <= blocksize) ? blocksize : size%blocksize);
-		arr[(size <= blocksize) ? blocksize : size%blocksize] = '\0';
+		int s = (size < blocksize) ? size%blocksize : blocksize;
+		memcpy(arr, dat.c_str(), s);
 		size -= blocksize;
-		data += arr;
+		for (int i = 0; i < s; i++)
+		{
+			data += arr[i];
+		}
 	}
 	return 0;
 }
@@ -156,7 +162,7 @@ const int MemBlockDevice::LoadFileHead(FileHeader & file, int blocknr)
 
 	int temp;
 
-	memcpy(&file.blockPointers, dat.c_str() + offset, sizeof(int)*file.nrofblocks);
+	memcpy(file.blockPointers, dat.c_str() + offset, sizeof(int)*file.nrofblocks);
 	offset += sizeof(int)*file.nrofblocks;
 	return 0;
 }

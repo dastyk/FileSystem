@@ -119,6 +119,51 @@ std::string FileSystem::create(const std::string & name)
 	return "";
 }
 
+std::string FileSystem::create(const std::string & name, const std::string & data)
+{
+	Directory root;
+
+	int r = root.Read(&mMemblockDevice, mCurrDir);
+	if (r == -1)
+		return "Could not find root.";
+
+	r = root.GetChildFile(&mMemblockDevice, name);
+	if (r != -1)
+		return "File already exist.\n\n";
+
+	File file(name, mCurrDir, data);
+	r = file.Save(&mMemblockDevice);
+	if (r == -1)
+		return "No memory\n";
+
+	r = root.AddFile(&mMemblockDevice, r);
+	if (r == -1)
+		return "No memory\n";
+
+	return "";
+}
+
+std::string FileSystem::cat(std::string & name)
+{
+	Directory root;
+
+	int r = root.Read(&mMemblockDevice, mCurrDir);
+	if (r == -1)
+		return "Could not find root.";
+
+
+	r = root.GetChildFile(&mMemblockDevice, name);
+	if (r != -1)
+	{
+		File file;
+		r = file.Read(&mMemblockDevice, r);
+		file.DumpData(&mMemblockDevice);
+		return "";
+		
+	}
+	return "Fail";
+}
+
 std::string FileSystem::rm(const std::string & filePath)
 {
 	Directory root;
@@ -135,6 +180,57 @@ std::string FileSystem::rm(const std::string & filePath)
 		return "";
 
 	return "No such file or directory.";
+}
+
+std::string FileSystem::copy(const std::string & source, const std::string & dest)
+{
+	Directory root;
+	int r = root.Read(&mMemblockDevice, mCurrDir);
+	if (r == -1)
+		return "Could not find root.";
+
+	r = root.GetChildFile(&mMemblockDevice, source);
+	if (r == -1)
+		return "Source file not found.";
+
+	File files;
+	r = files.Read(&mMemblockDevice, r);
+	if (r == -1)
+		return "Feeeel";
+
+	return create(dest, files.ToString());
+}
+
+std::string FileSystem::append(const std::string & source, const std::string & app)
+{
+	Directory root;
+	int r = root.Read(&mMemblockDevice, mCurrDir);
+	if (r == -1)
+		return "Could not find root.";
+
+	r = root.GetChildFile(&mMemblockDevice, source);
+	if (r == -1)
+		return "Source file not found.";
+
+	File files;
+	r = files.Read(&mMemblockDevice, r);
+	if (r == -1)
+		return "Feeeel";
+
+	r = root.GetChildFile(&mMemblockDevice, app);
+	if (r == -1)
+		return "Append file not found.";
+
+	File filea;
+	r = filea.Read(&mMemblockDevice, r);
+	if (r == -1)
+		return "Feeeel";
+
+	r = files.AddData(&mMemblockDevice, filea.ToString());
+	if (r == -1)
+		return "Feeeel";
+
+	return "";
 }
 
 std::string FileSystem::rename(const std::string & source, const std::string & newName)

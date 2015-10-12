@@ -28,7 +28,8 @@ public:
     std::string ls();
     std::string ls(const std::string &path) const;  // optional
     std::string create(const std::string &name);
-    std::string cat(std::string &name) const;
+	std::string create(const std::string &name, const std::string &data);
+    std::string cat(std::string &name);
     std::string save(const std::string &saveFile) const;
     std::string read(const std::string &saveFile) const;
     std::string rm(const std::string &filePath);

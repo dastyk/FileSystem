@@ -10,6 +10,7 @@ public:
 	File();
 	File(string name);
 	File(string name, int parent);
+	File(string name, int parent, const string &data);
 
 
 	virtual ~File();
@@ -28,10 +29,12 @@ public:
 	int DeleteDir(MemBlockDevice* dev, string name);
 	int DeleteFile(MemBlockDevice* dev, string name);
 
+	int DumpData(MemBlockDevice* dev);
+
 	int AddDir(MemBlockDevice* dev, int blockNr);
 	int AddFile(MemBlockDevice* dev, int blockNr);
 
-	void AddData(const string& data);
+	int AddData(MemBlockDevice * dev, const string& data);
 
 	const string ToString() const;
 
