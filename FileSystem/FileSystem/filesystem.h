@@ -9,13 +9,14 @@ class FileSystem
 private:
     MemBlockDevice mMemblockDevice;
     // Here you can add your own data structures
-	int mCurrDir;
+	Directory* mCurrDir;
 public:
 	int Init();
 	std::string GetCurrDirPath();
 	std::string cd(std::string& name);
-	std::string cd(std::string names[], int count);
+	std::string cd(vector<string>& path);
 	std::string mkdir(const std::string &name);
+	std::string copy(vector<string> &source, vector<string> &dest);
 public:
     FileSystem();
 	~FileSystem();
@@ -26,12 +27,12 @@ public:
      */
     std::string format();
     std::string ls();
-    std::string ls(const std::string &path) const;  // optional
+    std::string ls(const vector<string> &path);  // optional
     std::string create(const std::string &name);
 	std::string create(const std::string &name, const std::string &data);
     std::string cat(std::string &name);
-    std::string save(const std::string &saveFile) const;
-    std::string read(const std::string &saveFile) const;
+    std::string save(const std::string &saveFile);
+    std::string read(const std::string &saveFile);
     std::string rm(const std::string &filePath);
     std::string copy(const std::string &source, const std::string &dest);
 

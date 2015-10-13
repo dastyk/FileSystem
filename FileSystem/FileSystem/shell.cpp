@@ -29,7 +29,6 @@ int main(void) {
 #endif
     string userCommand, commandArr[MAXCOMMANDS];
     string user = "user@DV1492";    // Change this if you want another user to be displayed
-
 	FileSystem fSystem;
 
 	if (fSystem.Init() == -1)
@@ -51,31 +50,45 @@ int main(void) {
                 bRun = false;
                 cout << "Exiting\n";
                 break;
-            case 1: // format
+            case 1: // format		
+				system("cls");
 				cout << fSystem.format() << endl;
                 break;
             case 2: // ls
                 cout << "Listing directory" << endl << endl;
-				cout << fSystem.ls();
+				if(nrOfCommands==1)
+					cout << fSystem.ls();
+				else
+				{
+					vector<string> path = split(commandArr[1]);
+					cout << fSystem.ls(path);
+				}
                 break;
             case 3: // create
 				cout << fSystem.create(commandArr[1]) << endl;
-                break;
+				break;
             case 4: // cat
 				cout << fSystem.cat(commandArr[1]) << endl;
                 break;
             case 5: // save
-
+				cout << fSystem.save(commandArr[1]) << endl;
                 break;
             case 6: // read
-
+				cout << fSystem.read(commandArr[1]) << endl;
                 break;
             case 7: // rm
 				cout << fSystem.rm(commandArr[1]) << endl;
                 break;
 
             case 8: // copy
-				cout << fSystem.copy(commandArr[1], commandArr[2]) << endl;
+			{
+				vector<string> ps = split(commandArr[1]);
+				vector<string> pc = split(commandArr[2]);
+				if (ps.size() == 1 && pc.size() == 1)
+					cout << fSystem.copy(commandArr[1], commandArr[2]) << endl;
+				else
+					cout << fSystem.copy(ps, pc) << endl;
+			}
                 break;
 
             case 9: // append
@@ -91,7 +104,15 @@ int main(void) {
                 break;
 
             case 12: // cd
-				cout << fSystem.cd(commandArr[1]) << endl;
+			{
+				vector<string> path = split(commandArr[1]);
+				if (path.size() == 1)
+					cout << fSystem.cd(commandArr[1]) << endl;
+				else
+				{
+					cout << fSystem.cd(path) << endl;
+				}
+			}
                 break;
 
             case 13: // pwd

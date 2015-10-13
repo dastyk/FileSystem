@@ -25,12 +25,14 @@ struct FileHeader
 		}
 	}
 };
+
+
 class MemBlockDevice: public BlockDevice
 {
 private:
 	int* mFreeBlocks;
 	int* mFilledBlocks;
-
+	int mFillSize;
 
 	bool file_exist(const std::string& fileName);
 	
@@ -40,9 +42,14 @@ public:
 	const int LoadFile(std::string & data, FileHeader& file, int blocknr);
 	const int LoadFileHead(FileHeader& file, int blocknr);
 
+	const int SaveToFile(const std::string& path);
+	const int LoadFromFile(const std::string& path);
+
 	const void FreeMemoryBlock(int blocknr)const;
 	const int Init();
 	const int Format();
+
+	const int GetStart();
 
 public:
     MemBlockDevice(int nrOfBlocks = 250);

@@ -20,6 +20,15 @@ Directory::Directory(string name, int parent) : mName(name), mParent(parent)
 	mBnum = -1;
 }
 
+Directory::Directory(const Directory * other)
+{
+	this->mBnum = other->mBnum;
+	this->mName = other->mName;
+	this->mParent = other->mParent;
+	this->mChildDir = other->mChildDir;
+	this->mChildFile = other->mChildFile;
+}
+
 
 Directory::~Directory()
 {
@@ -91,13 +100,13 @@ string Directory::PrintContent(MemBlockDevice* dev)
 	for (int i = 0; i < mChildDir.size(); i++)
 	{
 		dir.Read(dev, mChildDir[i]);
-		out += "/" + dir.GetName() + "\n\n";
+		out += "/" + dir.GetName() + " " + to_string(blocksize) + "\n\n";
 	}
 	File file;
 	for (int i = 0; i < mChildFile.size(); i++)
 	{
 		file.Read(dev, mChildFile[i]);
-		out += file.GetName() + "\n\n";
+		out += file.GetName() + " " + to_string(file.GetSize()) + "\n\n";
 	}
 	return out;
 }
@@ -225,9 +234,14 @@ int Directory::DeleteFile(MemBlockDevice * dev, string name)
 	return -1;
 }
 
-int Directory::GetParent()
+const int Directory::GetParent() const
 {
 	return mParent;
+}
+
+const int Directory::GetBlockNum() const
+{
+	return mBnum;
 }
 
 int Directory::AddDir(MemBlockDevice* dev, int blockNr)

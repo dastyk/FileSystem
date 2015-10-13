@@ -33,7 +33,7 @@ const int MemBlockDevice::SaveFile(const std::string & data, FileHeader& file, i
 		file.blockPointers = 0;
 
 	file.size = data.size();
-	file.nrofblocks = file.size / blocksize;
+	file.nrofblocks = (file.size / blocksize) + ((file.size % blocksize) ? 1 : 0);
 	if(file.nrofblocks > 0)
 		file.blockPointers = new int[file.nrofblocks];
 
@@ -167,6 +167,70 @@ const int MemBlockDevice::LoadFileHead(FileHeader & file, int blocknr)
 	return 0;
 }
 
+const int MemBlockDevice::SaveToFile(const std::string & path)
+{
+	char arr[blocksize];
+
+	//memBlocks[0].writeBlock((char*)&mFillSize, sizeof(int), 0);
+
+	int size = nrOfBlocks*sizeof(int);
+	int point = 0;
+	for (int i = 0; i < mFillSize; i++)
+	{
+		int s = (size < blocksize) ? size : blocksize;
+		memBlocks[1 + i * 2].writeBlock((char*)mFreeBlocks + point, s, 0);
+		memBlocks[2 + i * 2].writeBlock((char*)mFilledBlocks + point, s, 0);
+		point += s / sizeof(int);
+		size -= blocksize;
+	}
+
+	std::ofstream out;//("disk", std::ios::binary | std::ios::out);
+	out.open(path, std::ios::binary);
+	if (out.bad())
+		return -1;
+	for (int i = 0; i < nrOfBlocks; i++)
+	{
+		std::string in = memBlocks[i].toString();
+		out.write(in.c_str(), blocksize);
+	}
+
+	out.close();
+
+	return 1;
+}
+
+const int MemBlockDevice::LoadFromFile(const std::string & path)
+{
+	FILE* filePtr;
+	if (!file_exist(path))
+		return -1;
+
+	Format();
+
+	fopen_s(&filePtr, path.c_str(), "rb");
+
+	
+	char arr[blocksize];
+	for (int i = 0; i < nrOfBlocks; i++)
+	{
+		fread(arr, blocksize, 1, filePtr);
+		memBlocks[i].writeBlock(arr, blocksize, 0);
+	}
+
+	int size = nrOfBlocks*sizeof(int);
+	int point = 0;
+	for (int i = 0; i < mFillSize; i++)
+	{
+		int s = (size < blocksize) ? size : blocksize;
+		memcpy(mFreeBlocks + point, memBlocks[1 + i * 2].toString().c_str(), s);
+		memcpy(mFilledBlocks + point, memBlocks[2 + i * 2].toString().c_str(), s);
+		point += s/sizeof(int);
+		size -= blocksize;
+	}
+
+	return GetStart();
+}
+
 const void MemBlockDevice::FreeMemoryBlock(int blocknr) const
 {
 	mFreeBlocks[blocknr] = 1;
@@ -210,10 +274,22 @@ const int MemBlockDevice::Format()
 		mFilledBlocks[i] = 0;
 	}
 
-	// Reserve the first block
+	// Reserve the first block and blocks for the filled and free arrays
 	GetNextFreeBlock();
 
+	mFillSize = ((nrOfBlocks*sizeof(int)) / blocksize) + (((nrOfBlocks*sizeof(int)) % blocksize) ? 1 : 0);
+	for (int i = 0; i < mFillSize; i++)
+	{
+		GetNextFreeBlock();
+		GetNextFreeBlock();
+	}
+
 	return 0;
+}
+
+const int MemBlockDevice::GetStart()
+{
+	return 1 + mFillSize*2;
 }
 
 MemBlockDevice::MemBlockDevice(int nrOfBlocks): BlockDevice(nrOfBlocks) {

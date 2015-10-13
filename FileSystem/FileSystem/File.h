@@ -29,6 +29,8 @@ public:
 	int DeleteDir(MemBlockDevice* dev, string name);
 	int DeleteFile(MemBlockDevice* dev, string name);
 
+	int GetSize();
+
 	int DumpData(MemBlockDevice* dev);
 
 	int AddDir(MemBlockDevice* dev, int blockNr);

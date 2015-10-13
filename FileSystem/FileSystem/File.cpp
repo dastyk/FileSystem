@@ -14,16 +14,6 @@ File::File(string name) : Directory(name)
 
 File::File(string name, int parent) : Directory(name,parent)
 {
-	char data[blocksize*sizeof(int)];
-
-	for (int i = 0; i < 512; i++)
-	{
-		memcpy(data + i*sizeof(int), &i, sizeof(int));
-	}
-	for (int i = 0; i < blocksize*sizeof(int); i++)
-	{
-		mData += data[i];
-	}
 	mNumBlocks = 0;
 }
 
@@ -119,6 +109,11 @@ int File::DeleteDir(MemBlockDevice * dev, string name)
 int File::DeleteFile(MemBlockDevice * dev, string name)
 {
 	return 0;
+}
+
+int File::GetSize()
+{
+	return blocksize + mData.size();
 }
 
 int File::DumpData(MemBlockDevice * dev)

@@ -13,7 +13,7 @@ public:
 	Directory();
 	Directory(string name);
 	Directory(string name, int parent);
-
+	Directory(const Directory* other);
 
 	virtual ~Directory();
 
@@ -31,7 +31,8 @@ public:
 	virtual int DeleteDir(MemBlockDevice* dev, string name);
 	virtual int DeleteFile(MemBlockDevice* dev, string name);
 
-	int GetParent();
+	const int GetParent()const;
+	const int GetBlockNum()const;
 
 	virtual int AddDir(MemBlockDevice* dev, int blockNr);
 	virtual int AddFile(MemBlockDevice* dev, int blockNr);
